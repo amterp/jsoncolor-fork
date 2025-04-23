@@ -600,9 +600,7 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 
 		if x, ok := t.(json.Delim); ok {
 			if x == json.Delim('{') || x == json.Delim('[') {
-				if frame.inObject() {
-					fs.printSpace(" ", false)
-				} else {
+				if !frame.inObject() {
 					fs.printIndent()
 				}
 				err = fs.formatToken(x)
@@ -633,12 +631,10 @@ func (fs *formatterState) format(dst io.Writer, src []byte, terminateWithNewline
 			if printIndent {
 				fs.printIndent()
 			}
-			if !frame.inField() {
-				fs.printSpace(" ", false)
-			}
 			err = fs.formatToken(t)
 			if frame.inField() {
 				fs.printColon()
+				fs.printSpace(" ", false)
 			} else {
 				if printComma {
 					fs.printComma()
