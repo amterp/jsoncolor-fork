@@ -2,6 +2,7 @@ package jsoncolor
 
 import (
 	"encoding/json"
+	"github.com/fatih/color"
 	"log"
 	"testing"
 )
@@ -34,5 +35,32 @@ func Test_Issue7(t *testing.T) {
 
 	if goJsonStr != jsonColorStr {
 		t.Errorf("jsoncolor output %q does not match go's json output %s", jsonColorStr, goJsonStr)
+	}
+}
+
+func Test_MatchesGoForScalarFieldAndForListWithElements(t *testing.T) {
+	color.NoColor = true // color not important to this test
+
+	v := struct {
+		Number int   `json:"number"`
+		List   []int `json:"list"`
+	}{
+		Number: 123,
+		List:   []int{1, 2, 3},
+	}
+	goJsonBuf, err := json.MarshalIndent(v, "", " ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	jsonColorBuf, err := MarshalIndent(v, "", " ")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	goJsonStr := string(goJsonBuf)
+	jsonColorStr := string(jsonColorBuf)
+
+	if goJsonStr != jsonColorStr {
+		t.Errorf("jsoncolor output does not match go's json output. jsoncolor and go respectively:\n%q\n%q\n", jsonColorStr, goJsonStr)
 	}
 }
